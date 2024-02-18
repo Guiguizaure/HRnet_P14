@@ -1,0 +1,44 @@
+.employee_form{
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.employee_form h2{
+    font-size: 32px;
+    font-weight: 700;
+    margin: 30px 0;
+}
+.employee_form__header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+table{
+    width: 100%;
+    margin-bottom: 10px;
+}
+thead tr th{
+    padding: 18px 18px;
+    border-bottom: 1px solid #111;
+    font-weight: 700;
+}
+tbody tr td{
+    padding: 8px 10px;
+    border-top: 1px solid #ddd;
+
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+}
+tbody tr.odd{
+    background-color: #f9f9f9;
+}
+tbody tr.even{
+    background-color: #ffffff;
+}
+
+.employee_form .pagination{
+    margin-top: 20px;
+    /* display: flex;
+    justify-content: space-between; */
+}
+
