@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/Homepage/homepage";
-import EmployeeList from "./components/EmployeeList/employeeList";
+import EmployeeList from "./pages/EmployeeList/employeeList";
 
 const App: React.FC = () => {
   return (

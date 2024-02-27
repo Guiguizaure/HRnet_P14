@@ -42,3 +42,8 @@ tbody tr.even{
     justify-content: space-between; */
 }
 
+.show-select{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

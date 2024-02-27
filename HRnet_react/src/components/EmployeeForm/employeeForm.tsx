@@ -3,6 +3,7 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { states } from "../../data/statesData";
 import Modal from "../Modal/modal";
+import Select from "../Select/select";
 import "./employeeform.css";
 
 // Define a type for the form state
@@ -75,6 +76,19 @@ const EmployeeForm: React.FC = () => {
     setIsModalOpen(true);
     // Reset form or show confirmation here
   };
+
+  const stateOptions = states.map((state) => ({
+    value: state.abbreviation,
+    label: state.name,
+  }));
+
+  const departmentOptions = [
+    { value: "Sales", label: "Sales" },
+    { value: "Marketing", label: "Marketing" },
+    { value: "Engineering", label: "Engineering" },
+    { value: "Human Resources", label: "Human Resources" },
+    { value: "Legal", label: "Legal" },
+  ];
 
   return (
     <div className="container-sm">
@@ -157,18 +171,13 @@ const EmployeeForm: React.FC = () => {
 
           <div className="input-wrapper">
             <label htmlFor="state">State:</label>
-            <select
+            <Select
               id="state"
               name="state"
               value={formData.state}
               onChange={handleChange}
-            >
-              {states.map((state) => (
-                <option key={state.abbreviation} value={state.abbreviation}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
+              options={stateOptions}
+            />
           </div>
 
           <div className="input-wrapper">
@@ -185,18 +194,13 @@ const EmployeeForm: React.FC = () => {
 
         <div className="input-wrapper">
           <label htmlFor="department">Department:</label>
-          <select
+          <Select
             id="department"
             name="department"
             value={formData.department}
             onChange={handleChange}
-          >
-            <option value="Sales">Sales</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Human Resources">Human Resources</option>
-            <option value="Legal">Legal</option>
-          </select>
+            options={departmentOptions}
+          />
         </div>
 
         <button type="submit">Save</button>

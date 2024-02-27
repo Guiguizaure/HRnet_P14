@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { useTable, usePagination, useGlobalFilter, Column } from "react-table";
 import { useNavigate } from "react-router-dom";
+import Select from "../../components/Select/select";
 import "./employeeList.css";
 
 interface Employee {
@@ -73,7 +74,7 @@ const EmployeeList: React.FC = () => {
     {
       columns,
       data,
-      initialState: { pageIndex: 0, pageSize: 10 },
+      initialState: { pageIndex: 0, pageSize: 5 },
     },
     useGlobalFilter,
     usePagination
@@ -85,29 +86,36 @@ const EmployeeList: React.FC = () => {
 
   // Input change handler for the global search input
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGlobalFilter(e.target.value || undefined); // Set the global filter to the input value
+    setGlobalFilter(e.target.value || undefined);
   };
+
+  const pageSizeOptions = useMemo(
+    () => [
+      { value: "5", label: "5" },
+      { value: "10", label: "10" },
+      { value: "20", label: "20" },
+      { value: "30", label: "30" },
+      { value: "40", label: "40" },
+      { value: "50", label: "50" },
+    ],
+    []
+  );
 
   return (
     <div className="employee_form">
       <h2>Current Employees</h2>
       <div className="employee_form__header">
-        <span>
-          Show{" "}
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-            }}
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize}
-              </option>
-            ))}
-          </select>{" "}
-          entries
-        </span>
+        <div className="show-select">
+          <span>Show </span>
+          <Select
+            id="pageSizeSelect"
+            name="pageSize"
+            value={pageSize.toString()}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            options={pageSizeOptions}
+          />
+          <span>entries</span>
+        </div>
         <div>
           <label htmlFor="search">Search: </label>
           <input value={globalFilter || ""} onChange={handleSearch} />
