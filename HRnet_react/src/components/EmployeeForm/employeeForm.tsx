@@ -1,23 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { states } from "../../data/statesData";
-import Modal from "../Modal/modal";
+// import Modal from "../Modal/modal";
+// import { Modal } from "vite-react-ts-modal";
+import Modal from "npm-react-ts-modal";
 import Select from "../Select/select";
+import "../Modal/modal.css";
 import "./employeeform.css";
 
 // Define a type for the form state
 interface EmployeeFormState {
   firstName: string;
   lastName: string;
-  dateOfBirth: Date; // Using Date object for react-datepicker
-  startDate: Date; // Using Date object for react-datepicker
+  dateOfBirth: Date;
+  startDate: Date;
   street: string;
   city: string;
-  state: string; // Will store the abbreviation
+  state: string;
   zipCode: string;
   department: string;
 }
+
+const departmentOptions = [
+  { value: "Sales", label: "Sales" },
+  { value: "Marketing", label: "Marketing" },
+  { value: "Engineering", label: "Engineering" },
+  { value: "Human Resources", label: "Human Resources" },
+  { value: "Legal", label: "Legal" },
+];
 
 const EmployeeForm: React.FC = () => {
   const [formData, setFormData] = useState<EmployeeFormState>({
@@ -34,65 +45,57 @@ const EmployeeForm: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  // Handle input change for text inputs
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    },
+    []
+  );
 
-  // Special handling for date pickers
-  const handleDateChange = (
-    name: keyof EmployeeFormState,
-    date: Date | [Date, Date] | null
-  ) => {
-    if (date) {
-      setFormData({
+  const handleDateChange = useCallback(
+    (name: keyof EmployeeFormState, date: Date | [Date, Date] | null) => {
+      if (date) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          [name]: date as Date,
+        }));
+      }
+    },
+    []
+  );
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const existingEmployees = JSON.parse(
+        localStorage.getItem("employees") || "[]"
+      );
+      const newEmployee = {
         ...formData,
-        [name]: date as Date,
-      });
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const existingEmployees = JSON.parse(
-      localStorage.getItem("employees") || "[]"
-    );
-    const newEmployee = {
-      ...formData,
-      dateOfBirth: formData.dateOfBirth.toISOString(),
-      startDate: formData.startDate.toISOString(),
-    };
-    localStorage.setItem(
-      "employees",
-      JSON.stringify([...existingEmployees, newEmployee])
-    );
-    setIsModalOpen(true);
-    // Reset form or show confirmation here
-  };
+        dateOfBirth: formData.dateOfBirth.toISOString(),
+        startDate: formData.startDate.toISOString(),
+      };
+      localStorage.setItem(
+        "employees",
+        JSON.stringify([...existingEmployees, newEmployee])
+      );
+      setIsModalOpen(true);
+    },
+    [formData]
+  );
 
   const stateOptions = states.map((state) => ({
     value: state.abbreviation,
     label: state.name,
   }));
 
-  const departmentOptions = [
-    { value: "Sales", label: "Sales" },
-    { value: "Marketing", label: "Marketing" },
-    { value: "Engineering", label: "Engineering" },
-    { value: "Human Resources", label: "Human Resources" },
-    { value: "Legal", label: "Legal" },
-  ];
-
   return (
     <div className="container-sm">
-      <h2>Create Employee</h2>
+      <p>Create Employee</p>
       <form onSubmit={handleSubmit}>
         <div className="input-wrapper">
           <label htmlFor="firstName">First Name:</label>
@@ -207,7 +210,7 @@ const EmployeeForm: React.FC = () => {
       </form>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <h2>Employee Created!</h2>
+        <h4>Employee Created!</h4>
       </Modal>
     </div>
   );

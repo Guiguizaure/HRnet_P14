@@ -14,11 +14,13 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.10",
     "@mui/x-data-grid": "^6.19.4",
+    "npm-react-ts-modal": "^1.0.0",
     "react": "^18.2.0",
     "react-datepicker": "^6.1.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.1",
-    "react-table": "^7.8.0"
+    "react-table": "^7.8.0",
+    "vite-react-ts-modal": "^0.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
