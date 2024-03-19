@@ -1,20 +1,18 @@
-import React, { useState, useCallback } from "react";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { states } from "../../data/statesData";
-// import Modal from "../Modal/modal";
-// import { Modal } from "vite-react-ts-modal";
+import React, { useState, useCallback, Suspense, lazy } from "react";
+import { states, StateOption } from "../../data/statesData";
 import Modal from "npm-react-ts-modal";
 import Select from "../Select/select";
 import "../Modal/modal.css";
 import "./employeeform.css";
 
-// Define a type for the form state
+const ReactDatePicker = lazy(() => import("react-datepicker"));
+import "react-datepicker/dist/react-datepicker.css";
+
 interface EmployeeFormState {
   firstName: string;
   lastName: string;
-  dateOfBirth: Date;
-  startDate: Date;
+  dateOfBirth: Date | null;
+  startDate: Date | null;
   street: string;
   city: string;
   state: string;
@@ -34,13 +32,13 @@ const EmployeeForm: React.FC = () => {
   const [formData, setFormData] = useState<EmployeeFormState>({
     firstName: "",
     lastName: "",
-    dateOfBirth: new Date(),
-    startDate: new Date(),
+    dateOfBirth: null,
+    startDate: null,
     street: "",
     city: "",
     state: "",
     zipCode: "",
-    department: "Sales", // Assuming 'Sales' as default
+    department: "Sales",
   });
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -48,22 +46,14 @@ const EmployeeForm: React.FC = () => {
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value } = e.target;
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: value,
-      }));
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     },
     []
   );
 
   const handleDateChange = useCallback(
-    (name: keyof EmployeeFormState, date: Date | [Date, Date] | null) => {
-      if (date) {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          [name]: date as Date,
-        }));
-      }
+    (name: keyof EmployeeFormState, date: Date | null) => {
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: date }));
     },
     []
   );
@@ -76,8 +66,8 @@ const EmployeeForm: React.FC = () => {
       );
       const newEmployee = {
         ...formData,
-        dateOfBirth: formData.dateOfBirth.toISOString(),
-        startDate: formData.startDate.toISOString(),
+        dateOfBirth: formData.dateOfBirth?.toISOString(),
+        startDate: formData.startDate?.toISOString(),
       };
       localStorage.setItem(
         "employees",
@@ -108,48 +98,30 @@ const EmployeeForm: React.FC = () => {
           />
         </div>
 
-        <div className="input-wrapper">
-          <label htmlFor="lastName">Last Name:</label>
-          <input
-            id="lastName"
-            name="lastName"
-            type="text"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-        </div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <div className="input-wrapper">
+            <label htmlFor="dateOfBirth">Date of Birth:</label>
+            <ReactDatePicker
+              id="dateOfBirth"
+              selected={formData.dateOfBirth}
+              onChange={(date: Date) => handleDateChange("dateOfBirth", date)}
+              dateFormat="MM/dd/yyyy"
+            />
+          </div>
 
-        <div className="input-wrapper">
-          <label htmlFor="dateOfBirth">Date of Birth:</label>
-          <ReactDatePicker
-            id="dateOfBirth"
-            selected={formData.dateOfBirth}
-            onChange={(date: Date) => handleDateChange("dateOfBirth", date)}
-            dateFormat="MM/dd/yyyy"
-            showYearDropdown
-            scrollableYearDropdown
-            yearDropdownItemNumber={80} // Adjust as needed
-            showMonthDropdown
-          />
-        </div>
-
-        <div className="input-wrapper">
-          <label htmlFor="startDate">Start Date:</label>
-          <ReactDatePicker
-            id="startDate"
-            selected={formData.startDate}
-            onChange={(date: Date) => handleDateChange("startDate", date)}
-            dateFormat="MM/dd/yyyy"
-            showYearDropdown
-            scrollableYearDropdown
-            yearDropdownItemNumber={80} // Adjust as needed
-            showMonthDropdown
-          />
-        </div>
+          <div className="input-wrapper">
+            <label htmlFor="startDate">Start Date:</label>
+            <ReactDatePicker
+              id="startDate"
+              selected={formData.startDate}
+              onChange={(date: Date) => handleDateChange("startDate", date)}
+              dateFormat="MM/dd/yyyy"
+            />
+          </div>
+        </Suspense>
 
         <fieldset className="address">
           <legend>Address</legend>
-
           <div className="input-wrapper">
             <label htmlFor="street">Street:</label>
             <input
@@ -203,6 +175,20 @@ const EmployeeForm: React.FC = () => {
             value={formData.department}
             onChange={handleChange}
             options={departmentOptions}
+          />
+        </div>
+
+        <div className="input-wrapper">
+          <label htmlFor="state">State:</label>
+          <Select
+            id="state"
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            options={states.map((state: StateOption) => ({
+              value: state.abbreviation,
+              label: state.name,
+            }))}
           />
         </div>
 

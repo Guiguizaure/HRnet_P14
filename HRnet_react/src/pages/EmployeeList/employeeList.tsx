@@ -1,7 +1,7 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { useTable, usePagination, useGlobalFilter, Column } from "react-table";
 import { useNavigate } from "react-router-dom";
-import Select from "../../components/Select/select";
+// import Select from "../../components/Select/select";
 import "./employeeList.css";
 
 interface Employee {
@@ -27,32 +27,20 @@ const EmployeeList: React.FC = () => {
     setEmployees(storedEmployees);
   }, []);
 
-  const data = useMemo(() => employees, [employees]);
-
   const columns: Column<Employee>[] = useMemo(
     () => [
-      { Header: "First Name", accessor: "firstName" as keyof Employee },
-      { Header: "Last Name", accessor: "lastName" as keyof Employee },
-      { Header: "Start Date", accessor: "startDate" as keyof Employee },
-      { Header: "Department", accessor: "department" as keyof Employee },
-      { Header: "Date of Birth", accessor: "dateOfBirth" as keyof Employee },
-      { Header: "Street", accessor: "street" as keyof Employee },
-      { Header: "City", accessor: "city" as keyof Employee },
-      { Header: "State", accessor: "state" as keyof Employee },
-      { Header: "Zip Code", accessor: "zipCode" as keyof Employee },
+      { Header: "First Name", accessor: "firstName" },
+      { Header: "Last Name", accessor: "lastName" },
+      { Header: "Start Date", accessor: "startDate" },
+      { Header: "Department", accessor: "department" },
+      { Header: "Date of Birth", accessor: "dateOfBirth" },
+      { Header: "Street", accessor: "street" },
+      { Header: "City", accessor: "city" },
+      { Header: "State", accessor: "state" },
+      { Header: "Zip Code", accessor: "zipCode" },
     ],
     []
   );
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-
-    const padTo2Digits = (num: number) => num.toString().padStart(2, "0");
-
-    return `${padTo2Digits(date.getMonth() + 1)}/${padTo2Digits(
-      date.getDate()
-    )}/${date.getFullYear()}`;
-  };
 
   const {
     getTableProps,
@@ -73,52 +61,50 @@ const EmployeeList: React.FC = () => {
   } = useTable(
     {
       columns,
-      data,
+      data: employees,
       initialState: { pageIndex: 0, pageSize: 5 },
     },
     useGlobalFilter,
     usePagination
   );
 
-  const handleNavigateHome = () => {
-    navigate("/");
-  };
+  const handleNavigateHome = useCallback(() => navigate("/"), [navigate]);
 
-  // Input change handler for the global search input
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGlobalFilter(e.target.value || undefined);
-  };
-
-  const pageSizeOptions = useMemo(
-    () => [
-      { value: "5", label: "5" },
-      { value: "10", label: "10" },
-      { value: "20", label: "20" },
-      { value: "30", label: "30" },
-      { value: "40", label: "40" },
-      { value: "50", label: "50" },
-    ],
-    []
+  const handleGlobalFilterChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setGlobalFilter(e.target.value || undefined);
+    },
+    [setGlobalFilter]
   );
 
   return (
-    <div className="employee_form">
+    <div className="employee_list">
       <h2>Current Employees</h2>
-      <div className="employee_form__header">
-        <div className="show-select">
-          <span>Show </span>
-          <Select
-            id="pageSizeSelect"
-            name="pageSize"
-            value={pageSize.toString()}
-            onChange={(e) => setPageSize(Number(e.target.value))}
-            options={pageSizeOptions}
-          />
-          <span>entries</span>
+      <div className="employee_list__header">
+        <div className="show">
+          <p>Show</p>
+          <select
+            className="show-select"
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+            }}
+          >
+            {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+              <option key={pageSize} value={pageSize}>
+                {pageSize}
+              </option>
+            ))}
+          </select>
+          <p>values</p>
         </div>
-        <div>
-          <label htmlFor="search">Search: </label>
-          <input value={globalFilter || ""} onChange={handleSearch} />
+        <div className="global_search">
+          <label htmlFor="global_search">Search: </label>
+          <input
+            id="global_search"
+            value={globalFilter || ""}
+            onChange={handleGlobalFilterChange}
+          />
         </div>
       </div>
       <table {...getTableProps()}>
@@ -132,59 +118,36 @@ const EmployeeList: React.FC = () => {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {page.map((row, index) => {
+          {page.map((row) => {
             prepareRow(row);
-            const rowClassName = index % 2 === 0 ? "even" : "odd";
             return (
-              <tr {...row.getRowProps()} className={rowClassName}>
-                {row.cells.map((cell) => {
-                  // Check if the cell is a date field and format it
-                  const formattedValue =
-                    cell.column.id === "dateOfBirth" ||
-                    cell.column.id === "startDate"
-                      ? formatDate(cell.value)
-                      : cell.render("Cell");
-                  return <td {...cell.getCellProps()}>{formattedValue}</td>;
-                })}
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell) => (
+                  <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                ))}
               </tr>
             );
           })}
         </tbody>
       </table>
-      {/* Pagination Controls */}
       <div className="pagination">
         <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
           {"<<"}
-        </button>{" "}
+        </button>
         <button onClick={() => previousPage()} disabled={!canPreviousPage}>
           {"<"}
-        </button>{" "}
+        </button>
         <button onClick={() => nextPage()} disabled={!canNextPage}>
           {">"}
-        </button>{" "}
+        </button>
         <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
           {">>"}
-        </button>{" "}
+        </button>
         <span>
-          Page{" "}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{" "}
-        </span>
-        <span>
-          | Go to page:{" "}
-          <input
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              gotoPage(page);
-            }}
-            style={{ width: "100px" }}
-          />
+          Page {pageIndex + 1} of {pageOptions.length}
         </span>
       </div>
-      <button onClick={handleNavigateHome} style={{ marginTop: "20px" }}>
+      <button className="home-button" onClick={handleNavigateHome}>
         Home
       </button>
     </div>
