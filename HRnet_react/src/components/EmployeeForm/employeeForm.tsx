@@ -85,7 +85,7 @@ const EmployeeForm: React.FC = () => {
 
   return (
     <div className="container-sm">
-      <p>Create Employee</p>
+      <h2>Create Employee</h2>
       <form onSubmit={handleSubmit}>
         <div className="input-wrapper">
           <label htmlFor="firstName">First Name:</label>
@@ -98,6 +98,17 @@ const EmployeeForm: React.FC = () => {
           />
         </div>
 
+        <div className="input-wrapper">
+          <label htmlFor="firstName">Last Name:</label>
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            value={formData.lastName}
+            onChange={handleChange}
+          />
+        </div>
+
         <Suspense fallback={<div>Loading...</div>}>
           <div className="input-wrapper">
             <label htmlFor="dateOfBirth">Date of Birth:</label>
@@ -106,6 +117,9 @@ const EmployeeForm: React.FC = () => {
               selected={formData.dateOfBirth}
               onChange={(date: Date) => handleDateChange("dateOfBirth", date)}
               dateFormat="MM/dd/yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select" // Optional: 'scroll' or 'select'
             />
           </div>
 
@@ -116,6 +130,9 @@ const EmployeeForm: React.FC = () => {
               selected={formData.startDate}
               onChange={(date: Date) => handleDateChange("startDate", date)}
               dateFormat="MM/dd/yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
             />
           </div>
         </Suspense>
@@ -178,21 +195,9 @@ const EmployeeForm: React.FC = () => {
           />
         </div>
 
-        <div className="input-wrapper">
-          <label htmlFor="state">State:</label>
-          <Select
-            id="state"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            options={states.map((state: StateOption) => ({
-              value: state.abbreviation,
-              label: state.name,
-            }))}
-          />
+        <div className="btn-container">
+          <button type="submit">Save</button>
         </div>
-
-        <button type="submit">Save</button>
       </form>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

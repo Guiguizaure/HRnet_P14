@@ -6,9 +6,33 @@ form .input-wrapper{
 form .input-wrapper label{
     margin-bottom: 8px;
 }
+form select{
+    height: 30px;
+    padding-left: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    background: #ededed;
+    font-weight: normal;
+    color: #2b2b2b;
+}
+form input{
+    height: 18px;
+    border: 1px solid rgb(118, 118, 118);
+    border-radius: 2px;
+    width: 55%;
+}
+.btn-container{
+    display: flex;
+    justify-content: center;
+}
+form button{
+
+}
 h2{
     text-align: center;
 }
+
+
 
 fieldset{
     margin-bottom: 20px;
