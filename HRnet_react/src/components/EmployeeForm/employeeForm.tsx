@@ -1,5 +1,5 @@
 import React, { useState, useCallback, Suspense, lazy } from "react";
-import { states, StateOption } from "../../data/statesData";
+import { states } from "../../data/statesData";
 import Modal from "npm-react-ts-modal";
 import Select from "../Select/select";
 import "../Modal/modal.css";
