@@ -5,7 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Additional Vite-specific build options
-    minify: 'esbuild', // Default is 'esbuild', can be changed to 'terser' if needed
+    minify: 'esbuild', 
   }
 })

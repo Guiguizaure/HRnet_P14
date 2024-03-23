@@ -1,24 +1,38 @@
 import React, { useState, useCallback, Suspense, lazy } from "react";
+import { useAppDispatch } from "../../store/hooks";
+import { Employee as EmployeeModel } from "../../models/Employee";
+import { addEmployee } from "../../store/employeeSlice";
 import { states } from "../../data/statesData";
 import Modal from "npm-react-ts-modal";
 import Select from "../Select/select";
+// import { addEmployee } from "../../store/actions/employeeActions";
 import "../Modal/modal.css";
 import "./employeeform.css";
-
-const ReactDatePicker = lazy(() => import("react-datepicker"));
 import "react-datepicker/dist/react-datepicker.css";
 
 interface EmployeeFormState {
   firstName: string;
   lastName: string;
-  dateOfBirth: Date | null;
-  startDate: Date | null;
+  dateOfBirth: string;
+  startDate: string;
   street: string;
   city: string;
   state: string;
   zipCode: string;
   department: string;
 }
+
+// interface SerializableEmployeeFormData {
+//   firstName: string;
+//   lastName: string;
+//   dateOfBirth: string; // For dispatch, use string
+//   startDate: string; // For dispatch, use string
+//   street: string;
+//   city: string;
+//   state: string;
+//   zipCode: string;
+//   department: string;
+// }
 
 const departmentOptions = [
   { value: "Sales", label: "Sales" },
@@ -29,17 +43,19 @@ const departmentOptions = [
 ];
 
 const EmployeeForm: React.FC = () => {
-  const [formData, setFormData] = useState<EmployeeFormState>({
+  const [formData, setFormData] = useState<EmployeeModel>({
     firstName: "",
     lastName: "",
-    dateOfBirth: null,
-    startDate: null,
+    dateOfBirth: "",
+    startDate: "",
     street: "",
     city: "",
     state: "",
     zipCode: "",
     department: "Sales",
   });
+
+  const dispatch = useAppDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -53,7 +69,8 @@ const EmployeeForm: React.FC = () => {
 
   const handleDateChange = useCallback(
     (name: keyof EmployeeFormState, date: Date | null) => {
-      setFormData((prevFormData) => ({ ...prevFormData, [name]: date }));
+      const dateStr = date ? date.toISOString().split("T")[0] : "";
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: dateStr }));
     },
     []
   );
@@ -61,22 +78,21 @@ const EmployeeForm: React.FC = () => {
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const existingEmployees = JSON.parse(
-        localStorage.getItem("employees") || "[]"
-      );
-      const newEmployee = {
-        ...formData,
-        dateOfBirth: formData.dateOfBirth?.toISOString(),
-        startDate: formData.startDate?.toISOString(),
-      };
-      localStorage.setItem(
-        "employees",
-        JSON.stringify([...existingEmployees, newEmployee])
-      );
+      // const serializableFormData = {
+      //   ...formData,
+      //   dateOfBirth: formData.dateOfBirth
+      //     ? formData.dateOfBirth.toISOString()
+      //     : "",
+      //   startDate: formData.startDate ? formData.startDate.toISOString() : "",
+      // };
+      // console.log("Dispatching action with payload:", serializableFormData);
+      dispatch(addEmployee(formData as EmployeeModel));
       setIsModalOpen(true);
     },
-    [formData]
+    [dispatch, formData]
   );
+
+  const ReactDatePicker = lazy(() => import("react-datepicker"));
 
   const stateOptions = states.map((state) => ({
     value: state.abbreviation,
@@ -114,12 +130,14 @@ const EmployeeForm: React.FC = () => {
             <label htmlFor="dateOfBirth">Date of Birth:</label>
             <ReactDatePicker
               id="dateOfBirth"
-              selected={formData.dateOfBirth}
+              selected={
+                formData.dateOfBirth ? new Date(formData.dateOfBirth) : null
+              }
               onChange={(date: Date) => handleDateChange("dateOfBirth", date)}
               dateFormat="MM/dd/yyyy"
               showMonthDropdown
               showYearDropdown
-              dropdownMode="select" // Optional: 'scroll' or 'select'
+              dropdownMode="select"
             />
           </div>
 
@@ -127,7 +145,9 @@ const EmployeeForm: React.FC = () => {
             <label htmlFor="startDate">Start Date:</label>
             <ReactDatePicker
               id="startDate"
-              selected={formData.startDate}
+              selected={
+                formData.startDate ? new Date(formData.startDate) : null
+              }
               onChange={(date: Date) => handleDateChange("startDate", date)}
               dateFormat="MM/dd/yyyy"
               showMonthDropdown

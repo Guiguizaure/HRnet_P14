@@ -1,39 +1,54 @@
-import React, { useMemo, useEffect, useState, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { useTable, usePagination, useGlobalFilter, Column } from "react-table";
 import { useNavigate } from "react-router-dom";
+// import { useSelector } from "react-redux";
+import { useAppSelector } from "../../store/hooks";
 // import Select from "../../components/Select/select";
 import "./employeeList.css";
 
-interface Employee {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  startDate: string;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  department: string;
-}
+// interface Employee {
+//   firstName: string;
+//   lastName: string;
+//   dateOfBirth: string;
+//   startDate: string;
+//   street: string;
+//   city: string;
+//   state: string;
+//   zipCode: string;
+//   department: string;
+// }
 
 const EmployeeList: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const employees = useAppSelector((state) => state.employees.employeeList);
+  // const [employees, setEmployees] = useState<Employee[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedEmployees = JSON.parse(
-      localStorage.getItem("employees") || "[]"
-    );
-    setEmployees(storedEmployees);
-  }, []);
+  // useEffect(() => {
+  //   const storedEmployees = JSON.parse(
+  //     localStorage.getItem("employees") || "[]"
+  //   );
+  //   setEmployees(storedEmployees);
+  // }, []);
 
-  const columns: Column<Employee>[] = useMemo(
+  const columns: Column<object>[] = useMemo(
     () => [
       { Header: "First Name", accessor: "firstName" },
       { Header: "Last Name", accessor: "lastName" },
-      { Header: "Start Date", accessor: "startDate" },
+      {
+        Header: "Start Date",
+        accessor: "startDate",
+        // Format the startDate before rendering
+        Cell: ({ value }) =>
+          value ? new Date(value).toLocaleDateString() : "N/A",
+      },
       { Header: "Department", accessor: "department" },
-      { Header: "Date of Birth", accessor: "dateOfBirth" },
+      {
+        Header: "Date of Birth",
+        accessor: "dateOfBirth",
+        // Format the dateOfBirth before rendering
+        Cell: ({ value }) =>
+          value ? new Date(value).toLocaleDateString() : "N/A",
+      },
       { Header: "Street", accessor: "street" },
       { Header: "City", accessor: "city" },
       { Header: "State", accessor: "state" },
