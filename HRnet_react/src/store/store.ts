@@ -8,10 +8,10 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['employees/addEmployee'], // Ignore serialization checks for specific actions
-        ignoredPaths: ['employees.employeeList.dateOfBirth', 'employees.employeeList.startDate'], // Ignore specific paths
-      },
+      // serializableCheck: {
+      //   ignoredActions: ['employees/addEmployee'], // Ignore serialization checks for specific actions
+      //   ignoredPaths: ['employees.employeeList.dateOfBirth', 'employees.employeeList.startDate'], // Ignore specific paths
+      // },
     }),
 });
 

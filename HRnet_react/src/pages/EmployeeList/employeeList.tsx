@@ -6,29 +6,9 @@ import { useAppSelector } from "../../store/hooks";
 // import Select from "../../components/Select/select";
 import "./employeeList.css";
 
-// interface Employee {
-//   firstName: string;
-//   lastName: string;
-//   dateOfBirth: string;
-//   startDate: string;
-//   street: string;
-//   city: string;
-//   state: string;
-//   zipCode: string;
-//   department: string;
-// }
-
 const EmployeeList: React.FC = () => {
   const employees = useAppSelector((state) => state.employees.employeeList);
-  // const [employees, setEmployees] = useState<Employee[]>([]);
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const storedEmployees = JSON.parse(
-  //     localStorage.getItem("employees") || "[]"
-  //   );
-  //   setEmployees(storedEmployees);
-  // }, []);
 
   const columns: Column<object>[] = useMemo(
     () => [
@@ -37,7 +17,7 @@ const EmployeeList: React.FC = () => {
       {
         Header: "Start Date",
         accessor: "startDate",
-        // Format the startDate before rendering
+
         Cell: ({ value }) =>
           value ? new Date(value).toLocaleDateString() : "N/A",
       },
@@ -45,7 +25,7 @@ const EmployeeList: React.FC = () => {
       {
         Header: "Date of Birth",
         accessor: "dateOfBirth",
-        // Format the dateOfBirth before rendering
+
         Cell: ({ value }) =>
           value ? new Date(value).toLocaleDateString() : "N/A",
       },

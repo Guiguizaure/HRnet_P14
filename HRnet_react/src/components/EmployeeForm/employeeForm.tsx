@@ -22,18 +22,6 @@ interface EmployeeFormState {
   department: string;
 }
 
-// interface SerializableEmployeeFormData {
-//   firstName: string;
-//   lastName: string;
-//   dateOfBirth: string; // For dispatch, use string
-//   startDate: string; // For dispatch, use string
-//   street: string;
-//   city: string;
-//   state: string;
-//   zipCode: string;
-//   department: string;
-// }
-
 const departmentOptions = [
   { value: "Sales", label: "Sales" },
   { value: "Marketing", label: "Marketing" },
@@ -42,18 +30,20 @@ const departmentOptions = [
   { value: "Legal", label: "Legal" },
 ];
 
+const initialState: EmployeeModel = {
+  firstName: "",
+  lastName: "",
+  dateOfBirth: "",
+  startDate: "",
+  street: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  department: "Sales",
+};
+
 const EmployeeForm: React.FC = () => {
-  const [formData, setFormData] = useState<EmployeeModel>({
-    firstName: "",
-    lastName: "",
-    dateOfBirth: "",
-    startDate: "",
-    street: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    department: "Sales",
-  });
+  const [formData, setFormData] = useState<EmployeeModel>(initialState);
 
   const dispatch = useAppDispatch();
 
@@ -78,16 +68,9 @@ const EmployeeForm: React.FC = () => {
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      // const serializableFormData = {
-      //   ...formData,
-      //   dateOfBirth: formData.dateOfBirth
-      //     ? formData.dateOfBirth.toISOString()
-      //     : "",
-      //   startDate: formData.startDate ? formData.startDate.toISOString() : "",
-      // };
-      // console.log("Dispatching action with payload:", serializableFormData);
       dispatch(addEmployee(formData as EmployeeModel));
       setIsModalOpen(true);
+      setFormData(initialState);
     },
     [dispatch, formData]
   );
